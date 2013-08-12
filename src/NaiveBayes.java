@@ -46,7 +46,7 @@ public class NaiveBayes {
 	int stdDevOfset = 10;
 	int stdDevThresh = 29;
 	int meanPixelValue = 0;
-	int meanPixelOfset = 29;
+	int meanPixelOfset = 25;
 
 
 	public NaiveBayes(ImageProcessor ip) throws IOException{
@@ -56,7 +56,7 @@ public class NaiveBayes {
 	}
 	public ArrayList<Integer> createFeatureVector(int[][] img){
 		ArrayList<Integer> returnArray = new ArrayList<Integer>();
-		for (int i = 0; i < 6; i++) returnArray.add(i,0);
+		for (int i = 0; i < 7; i++) returnArray.add(i,0);
 		// Standard Deviation
 		int val = standardDeviation(img);
 		if (val > stdDevThresh - stdDevOfset && val < stdDevThresh + stdDevOfset){
@@ -74,8 +74,10 @@ public class NaiveBayes {
 			returnArray.set(3, returnArray.get(3)+1);
 		if (detectCheeks(img))
 			returnArray.set(4, returnArray.get(4)+1);
-//		if (templateMatch(img))
-//			returnArray.set(5, returnArray.get(5)+1);
+		if (templateMatch(img))
+			returnArray.set(5, returnArray.get(5)+1);
+		if (detectNose(img))
+			returnArray.set(6, returnArray.get(6)+1);
 
 		return returnArray;
 
@@ -95,7 +97,7 @@ public void setUpTrainingFeatures(){
 	meanPixelValue/= testFaces.size()*testFaces.get(0).length * testFaces.get(0)[0].length;
 
 	// Initialise Arrays
-	for (int i = 0; i < 6; i++){
+	for (int i = 0; i < 7; i++){
 		featuresInFace.add(i,0);featuresInNonFace.add(i,0);
 	}
 
@@ -131,10 +133,15 @@ public void setUpTrainingFeatures(){
 			featuresInFace.set(4, featuresInFace.get(4)+1);
 			vector.set(4,1);
 		}
-//		if (templateMatch(img)){
-//			featuresInFace.set(5, featuresInFace.get(5)+1);
-//			vector.set(5,1);
-//		}
+		if (templateMatch(img)){
+			featuresInFace.set(5, featuresInFace.get(5)+1);
+			vector.set(5,1);
+		}
+		if (detectNose(img)){
+			featuresInFace.set(6, featuresInFace.get(6)+1);
+			vector.set(6,1);
+		}
+		else
 		try {
 			if(co < 6){
 				outputBlobs(img, "edited/faces/"+img+".png");
@@ -146,12 +153,13 @@ public void setUpTrainingFeatures(){
 		vector.set(vector.size()-1,1);
 		outputFile.add(vector);
 	}
-	System.out.println("Faces Correct StdDev: "+featuresInFace.get(0)+"/"+trainFaces.size());
-	System.out.println("Faces Correct Mean: "+featuresInFace.get(1)+"/"+trainFaces.size());
-	System.out.println("Faces Correct Eyes: "+featuresInFace.get(2)+"/"+trainFaces.size());
-	System.out.println("Faces Correct Mouth: "+featuresInFace.get(3)+"/"+trainFaces.size());
-	System.out.println("Faces Correct Cheeks: "+featuresInFace.get(4)+"/"+trainFaces.size());
-	System.out.println("Faces Correct Template: "+featuresInFace.get(5)+"/"+trainFaces.size());
+	System.out.println("Faces Correct StdDev: "+(double)featuresInFace.get(0)/trainFaces.size());
+	System.out.println("Faces Correct Mean: "+(double)featuresInFace.get(1)/trainFaces.size());
+	System.out.println("Faces Correct Eyes: "+(double)featuresInFace.get(2)/trainFaces.size());
+	System.out.println("Faces Correct Mouth: "+(double)featuresInFace.get(3)/trainFaces.size());
+	System.out.println("Faces Correct Cheeks: "+(double)featuresInFace.get(4)/trainFaces.size());
+	System.out.println("Faces Correct Template: "+(double)featuresInFace.get(5)/trainFaces.size());
+	System.out.println("Faces Correct Nose: "+(double)featuresInFace.get(6)/trainFaces.size());
 	System.out.println();
 
 	for (int[][] img: trainNonFaces){
@@ -185,39 +193,53 @@ public void setUpTrainingFeatures(){
 			featuresInNonFace.set(4, featuresInNonFace.get(4)+1);
 			vector.set(4,1);
 		}
-		//if (templateMatch(img)){
-		//	featuresInNonFace.set(5, featuresInNonFace.get(5)+1);
-		//	vector.set(5,1);
-		//}
+		if (templateMatch(img)){
+			featuresInNonFace.set(5, featuresInNonFace.get(5)+1);
+			vector.set(5,1);
+		}
+		if (detectNose(img)){
+			featuresInNonFace.set(6, featuresInNonFace.get(6)+1);
+			vector.set(6,1);
+		}
 		vector.set(vector.size()-1,0);
 		outputFile.add(vector);
 	}
-	System.out.println("Faces Incorrect StdDev: "+featuresInNonFace.get(0)+"/"+trainNonFaces.size());
-	System.out.println("Faces Incorrect Mean: "+featuresInNonFace.get(1)+"/"+trainNonFaces.size());
-	System.out.println("Faces Incorrect Eyes: "+featuresInNonFace.get(2)+"/"+trainNonFaces.size());
-	System.out.println("Faces Incorrect Mouth: "+featuresInNonFace.get(3)+"/"+trainNonFaces.size());
-	System.out.println("Faces Incorrect Cheeks: "+featuresInNonFace.get(4)+"/"+trainNonFaces.size());
-	System.out.println("Faces Incorrect Template: "+featuresInNonFace.get(5)+"/"+trainNonFaces.size());
-
+	System.out.println("Faces Incorrect StdDev: "+(double)featuresInNonFace.get(0)/trainNonFaces.size());
+	System.out.println("Faces Incorrect Mean: "+(double)featuresInNonFace.get(1)/trainNonFaces.size());
+	System.out.println("Faces Incorrect Eyes: "+(double)featuresInNonFace.get(2)/trainNonFaces.size());
+	System.out.println("Faces Incorrect Mouth: "+(double)featuresInNonFace.get(3)/trainNonFaces.size());
+	System.out.println("Faces Incorrect Cheeks: "+(double)featuresInNonFace.get(4)/trainNonFaces.size());
+	System.out.println("Faces Incorrect Template: "+(double)featuresInNonFace.get(5)/trainNonFaces.size());
+	System.out.println("Faces Incorrect Nose: "+(double)featuresInNonFace.get(6)/trainNonFaces.size());
 	CSVWriter.generateCsvFile(outputFile, "featureVectors.csv");
 }
 
 public boolean templateMatch (int[][] img){
-	int off = 20;
-	int count = 0;
-	for (int y= 5;y<img.length-1;y++){
-		for (int x= 5;x<img.length-1;x++){
-			for(int eyeX = 0;eyeX < eye.length;eyeX++){
-				for(int eyeY = 0;eyeY < eye[0].length;eyeY++){
-					if (pixelAt(eye,eyeX, eyeY) > pixelAt(img,x-eyeX, y-eyeY)-off && pixelAt(eye,eyeX, eyeY) < pixelAt(img,x-eyeX, y-eyeY) + off)
-						count ++;
-				}
+	img = noiseFilterMedian(img);
+	double minSAD = 100000;
+	for (int y= 0;y<(img.length/2)-eye.length;y++){
+		for (int x= 0;x<img.length-eye[0].length;x++){
+			double SAD = 0.0;
+			for(int j = 0;j < eye[0].length;j++){
+			for(int i = 0;i < eye.length;i++){
+					int imgPixel  = pixelAt(img, x+i, y+j);
+					int templatePixel  = pixelAt(eye, i, j);
+					   SAD += Math.abs( imgPixel - templatePixel);
 			}
-			if (count >=15)
-				return true;
-			count = 0;
+			}
+			  if ( minSAD > SAD ) {
+		            minSAD = SAD;
+		            // give me min SAD
+		            //System.out.println(minSAD);
+//		            position.bestRow = x;
+//		            position.bestCol = y;
+//		            position.bestSAD = SAD;
+		        }
+
 		}
 	}
+	if (minSAD <= 600) return true;
+   // System.out.println(minSAD);
 	return false;
 }
 
@@ -445,7 +467,33 @@ public boolean detectMouth(int[][] img){
  * @return
  */
 public boolean detectNose(int[][] img){
-	return false;
+	int[][] labels = connectedComponentAlgorithmEyes(img);
+	HashMap<Integer, Integer> blobs = new HashMap<Integer, Integer>();
+	for (int y = 0; y< img.length/3+img.length/3-1;y++){
+		for (int x = img.length/3; x< img.length/3+ img.length/3;x++){
+			if (labels[x][y] == 0) continue;
+			if (blobs.get(labels[x][y]) == null){
+				blobs.put(labels[x][y], 1);
+			}
+			else blobs.put(labels[x][y], blobs.get(labels[x][y])+1);
+		}
+	}
+
+	int acceptableBlobs = 0;
+	for (int i: blobs.keySet()){
+		if (blobs.get(i) > 6) acceptableBlobs++;
+	}
+	if (acceptableBlobs <= 1  )
+		return true;
+	else {
+		try {
+			outputBlobs(labels, "edited/faces/"+labels+".png");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return false;}
 }
 
 /**
@@ -493,6 +541,7 @@ public void classify(){
 	int faceCount =0;
 	int nonFaceCount = 0;
 	for (int[][] img: testFaces){
+
 		ArrayList<Integer> features = createFeatureVector(img);
 		double topEquationForNonFace= 0.0;
 		double topEquationForFace = 0.0;
@@ -530,12 +579,14 @@ public void classify(){
 		double face = (double)topEquationForFace/(double)bottomEquation;
 		double nonFace = (double)topEquationForNonFace/(double)bottomEquation;
 		//System.out.println(face+">>"+nonFace);
-		if (face > nonFace)faceCount++;
-		else nonFaceCount++;
+		if (face > nonFace){faceCount++;  }
+		else{ nonFaceCount++;
+		//outputToFile(img , "edited/faces/"+nonFaceCount+".png");
+		}
 
 	}
 
-	System.out.println("TEST FACES: faceC: "+faceCount+" non: "+ nonFaceCount+"/"+testFaces.size());
+	System.out.println("TEST FACES: TPF: "+(double)faceCount/testFaces.size()+" FPF: "+(double) nonFaceCount/testFaces.size());
 	faceCount = 0;
 	nonFaceCount = 0;
 	//// Second Dataset
@@ -581,7 +632,7 @@ public void classify(){
 		else nonFaceCount++;
 		//System.out.println(face+">>"+nonFace);
 	}
-	System.out.println("TEST NON FACES faceC: "+faceCount+" non: "+ nonFaceCount+"/"+testNonFaces.size());
+	System.out.println("TEST NON FACES faces FPF: "+(double)faceCount/testNonFaces.size()+" TPF: "+ (double)nonFaceCount/testNonFaces.size());
 }
 
 public int standardDeviation(int[][] img){
@@ -685,10 +736,13 @@ public void outputBlobs(int[][] img,String fname) throws IOException {
 public void outputToFile(int[][] img,String fname){
 	try {
 		BufferedImage returnImage = new BufferedImage(19, 19, BufferedImage.TYPE_INT_ARGB);
-		for (int x = 0;x<img.length;x++)
-			for (int y = 0;y<img[0].length;y++)
-				//returnImage.setRGB(x, y, new Color(pixelAt(img,x,y),pixelAt(img,x,y),pixelAt(img,x,y)).getRGB());
-				returnImage.setRGB(x, y, level_to_greyscale(pixelAt(img,x,y)));
+		for (int x = 0;x<img.length;x++){
+			for (int y = 0;y<img[0].length;y++){
+				//System.out.print(pixelAt(img,x,y)+" ");
+				returnImage.setRGB(x, y, new Color(pixelAt(img,x,y),pixelAt(img,x,y),pixelAt(img,x,y)).getRGB());}
+			//System.out.println();
+		}
+				//returnImage.setRGB(x, y, level_to_greyscale(pixelAt(img,x,y)));
 		File outputfile = new File(fname);
 		ImageIO.write(returnImage, "png", outputfile);
 	} catch (Exception e) {e.printStackTrace();}
