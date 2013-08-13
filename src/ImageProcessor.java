@@ -41,7 +41,7 @@ public void callMethods() throws IOException{
 	outputToFile(img,"edited/edited_median_filter_ckt-board-saltpep.png");
 
 	// Image Enhancement Blury Moon 1.3
-	img = convertTo2D(ImageIO.read(new File("images/blurry-moon.tif")));
+	img = convertTo2D(ImageIO.read(new File("images/blurry-moon.png")));
 	img = convolutionFilter(img);
 	outputToFile(img,"edited/edited_blurry-moon.png");
 
@@ -49,6 +49,7 @@ public void callMethods() throws IOException{
 	img = convertTo2D(ImageIO.read(new File("images/hubble.tif")));
 	img = threshold(img); //part 1.3
 	outputToFile(img,"edited/edited_hubble.png");
+
 }
 
 	public int[][] threshold(int[][] img) throws IOException{
@@ -146,34 +147,35 @@ public void callMethods() throws IOException{
 	}
 
 	public int[][] convolutionFilter(int[][] img)throws IOException{
-		double factor = 1.0/8 ;
+		double factor = 1.0 ;
 		double bias = 0;
+		int filterSize = 3;
 		int[][] newImage = new int[img.length][img[0].length];
-		//				double filter[][] = new double[][]
-		//						{
-		//						{-1, -1, -1},
-		//						{-1, 9, -1},
-		//						{-1, -1, -1}
-		//						};
-		double filter[][] = new double[][]
-				{
-				{-1,-1,-1,-1,-1},
-				{-1,2,2,2,-1},
-				{-1,2,8,2,-1},
-				{-1,-1,-1,-1,-1},
-				{-1,2,2,2,-1}
-				};
+						double filter[][] = new double[][]
+								{
+								{0, -1, 0},
+								{-1, 5, -1},
+								{0, -1, 0}
+								};
+//		double filter[][] = new double[][]
+//				{
+//				{-1,-1,-1,-1,-1},
+//				{-1,2,2,2,-1},
+//				{-1,2,8,2,-1},
+//				{-1,-1,-1,-1,-1},
+//				{-1,2,2,2,-1}
+//				};
 		//apply the filter
 		for(int x = 0; x < img.length; x++)
 			for(int y = 0; y < img[0].length; y++)
 			{
 				int val = 0;
 				//multiply every value of the filter with corresponding image pixel
-				for(int filterX = 0; filterX < 5; filterX++){
-					for(int filterY = 0; filterY < 5; filterY++)
+				for(int filterX = 0; filterX < filterSize; filterX++){
+					for(int filterY = 0; filterY < filterSize; filterY++)
 					{
-						int imageX = (x - 5 / 2 + filterX + img.length) % img.length;
-						int imageY = (y - 5 / 2 + filterY + img[0].length) % img[0].length;
+						int imageX = (x - filterSize / 2 + filterX + img.length) % img.length;
+						int imageY = (y - filterSize / 2 + filterY + img[0].length) % img[0].length;
 						val += pixelAt(img,imageX,imageY) * filter[filterX][filterY];
 					}
 					int mag	 = (int) (factor * val + bias);

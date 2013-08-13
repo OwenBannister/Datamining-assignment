@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/am/phoenix/home1/bannisowen/Downloads/libs/jai-1_1_3/lib/jai_codec.jar"/>
 	<classpathentry kind="lib" path="/am/phoenix/home1/bannisowen/Downloads/libs/jai-1_1_3/lib/jai_core.jar"/>
 	<classpathentry kind="lib" path="/am/phoenix/home1/bannisowen/Downloads/libs/jai-1_1_3/lib/mlibwrapper_jai.jar"/>
+	<classpathentry kind="lib" path="/am/phoenix/home1/bannisowen/Downloads/weka-3-6-10/weka.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

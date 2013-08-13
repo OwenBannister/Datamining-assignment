@@ -14,26 +14,40 @@ public class CSVWriter
 	try
 	{
 	    FileWriter writer = new FileWriter(fname);
-
-	    writer.append("StdDev");
-	    writer.append(',');
-	    writer.append("Mean");
-	    writer.append(',');
-	    writer.append("Eyes");
-	    writer.append(',');
-	    writer.append("Mouth");
-	    writer.append(',');
-	    writer.append("Cheeks");
-	    writer.append(',');
-	    writer.append("Template");
-	    writer.append(',');
-	    writer.append("Face");
+	    writer.append("@relation 'owens data'");
+	    writer.append('\n');
+	    writer.append("@attribute class-att {1, 0}");
+	    writer.append('\n');
+	    writer.append("@attribute StdDev numeric");
+	    writer.append('\n');
+	    writer.append("@attribute Mean numeric");
+	    writer.append('\n');
+	    writer.append("@attribute Eyes numeric");
+	    writer.append('\n');
+	    writer.append("@attribute Mouth numeric");
+	    writer.append('\n');
+	    writer.append("@attribute Cheeks numeric");
+	    writer.append('\n');
+	    writer.append("@attribute Template numeric");
+	    writer.append('\n');
+	    writer.append("@attribute Nose numeric");
+	    writer.append('\n');
+	    writer.append("@attribute BigTemplate numeric");
+	    writer.append('\n');
+	    writer.append("@attribute EyesToCheeks numeric");
+	    writer.append('\n');
+	    writer.append("@attribute EyesToNose numeric");
+	    writer.append('\n');
+	    writer.append("@data");
 	    writer.append('\n');
 
 
 	    for (ArrayList<Integer> feature: features){
-	    	for(int i: feature){
-	    	    writer.append(i+"");
+	    	writer.append(feature.get(feature.size()-1)+"");
+		    writer.append(',');
+
+	    	for(int i = 0; i < feature.size()-1; i++){
+	    	    writer.append(feature.get(i)+"");
 	    		writer.append(',');
 	    	}
 		    writer.append('\n');
@@ -44,9 +58,33 @@ public class CSVWriter
 	    writer.flush();
 	    writer.close();
 	}
+
+
 	catch(IOException e)
 	{
 	     e.printStackTrace();
 	}
     }
+	public static void test (ArrayList<ArrayList <Integer>> features){
+		 FileWriter writer;
+		try {
+			writer = new FileWriter("Test.dat");
+
+		    for (ArrayList<Integer> feature: features){
+		    	writer.append(feature.get(feature.size()-1)+"");
+			    writer.append(' ');
+			    if (feature.get(feature.size()-1) == 1)
+			    writer.append(5+"");
+			    else
+			    	 writer.append(1+"");
+			    writer.append('\n');
+		    }
+
+		    writer.flush();
+		    writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
